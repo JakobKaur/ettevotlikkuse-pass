@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sisse logimis leht</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #fff; color: #000; }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 14px 20px;
+    background: #d4d4d4;
+    border-bottom: 1px solid #aaa;
+    position: relative;
+  }
+
+
+  .nav-links {
+    display: flex; gap: 60px; list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none; color: #000; font-size: 15px; font-weight: bold;
+  }
+
+  /* MAIN */
+  main {
+    background: #fff;
+    min-height: 480px;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .login-box {
+    background: #c8c8c8;
+    border: 1px solid #aaa;
+    padding: 40px 50px 50px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .login-box h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 36px;
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+
+  .field label {
+    font-size: 16px;
+    font-weight: bold;
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  .field input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #000;
+    background: #d8d8d8;
+    font-size: 15px;
+    outline: none;
+  }
+
+  .btn-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .btn-row button {
+    padding: 10px 28px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #e0e0e0;
+    border: 1px solid #888;
+    cursor: pointer;
+  }
+  .btn-row button:hover { background: #ccc; }
+
+  /* FOOTER */
+  footer {
+    background: #999;
+    padding: 36px 20px;
+    text-align: center;
+    color: #fff;
+  }
+  footer h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 14px;
+  }
+  footer p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo-icon"></div>
+  <ul class="nav-links">
+    <li><a href="#">Meist</a></li>
+    <li><a href="#">Teenused</a></li>
+    <li><a href="#">Kontakt</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="login-box">
+    <h2>Sisse logimine</h2>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" placeholder="">
+    </div>
+    <div class="field">
+      <label>Parool</label>
+      <input type="password" placeholder="">
+    </div>
+    <div class="btn-row">
+      <button onclick="window.location.href='registreerimine.html'">Registreeri</button>
+      <button>Logi sisse</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <h2>Kontakt</h2>
+  <p>
+    Email: firma@gmail.com<br>
+    Tel: +372 5000 0000<br>
+    Aadress: Kopli 1, Tartu 50115 Eesti
+  </p>
+</footer>
+
+</body>
+</html>
+
