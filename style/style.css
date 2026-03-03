@@ -106,3 +106,109 @@ footer p {
   font-size: 14px;
   line-height: 1.8;
 }
+
+/* LOGIN PAGE STYLES */
+.login-box {
+  background: #c8c8c8;
+  border: 1px solid #aaa;
+  padding: 40px 50px 50px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.login-box h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 36px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.field label {
+  font-size: 16px;
+  font-weight: bold;
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.field input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #000;
+  background: #d8d8d8;
+  font-size: 15px;
+  outline: none;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.btn-row button {
+  padding: 10px 28px;
+  font-size: 16px;
+  font-weight: bold;
+  background: #e0e0e0;
+  border: 1px solid #888;
+  cursor: pointer;
+}
+
+.btn-row button:hover { 
+  background: #ccc; 
+}
+
+/* Main layout for login page */
+main {
+  background: #fff;
+  min-height: 480px;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* REGISTRATION PAGE STYLES */
+.reg-box {
+  background: #c8c8c8;
+  border: 1px solid #aaa;
+  padding: 40px 50px 50px;
+  width: 100%;
+  max-width: 860px;
+}
+
+.reg-box .field {
+  margin-bottom: 22px;
+}
+
+.reg-box .field label {
+  width: 180px;
+}
+
+.reg-box .field input {
+  flex: none;
+  padding: 8px;
+}
+
+.field input.wide {
+  width: 560px;
+}
+
+.field input.short {
+  width: 140px;
+}
+
+.reg-box .btn-row {
+  margin-top: 10px;
+  gap: 0;
+}
+
+.reg-box .btn-row button {
+  padding: 10px 32px;
+}
