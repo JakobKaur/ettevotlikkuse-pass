@@ -4,19 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Emaili kontroll</title>
-  <link rel="stylesheet" href="../style/style.css">
-
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
 
   <nav>
     <span class="logo-icon"></span>
     <ul class="nav-links">
-      <li><a href="#">Meist</a></li>
-      <li><a href="#">Teenused</a></li>
-      <li><a href="#">Kontakt</a></li>
+      <li><a href="esileht.html#meist">Meist</a></li>
+      <li><a href="esileht.html#teenused">Teenused</a></li>
+      <li><a href="esileht.html#kontakt">Kontakt</a></li>
     </ul>
     <div class="nav-btns"></div>
   </nav>
@@ -28,19 +25,19 @@
       <p>Sisestage kood, et jätkata registreerimisega.</p>
       <input type="text" class="code-input" placeholder="">
       <div class="btn-row">
-        <button>Jätka</button>
+        <button onclick="window.location.href='sisselogimine.html'">Jätka</button>
       </div>
     </div>
   </main>
 
- <footer>
-  <h2>Kontakt</h2>
-  <p>
-    Email: firma@gmail.com<br>
-    Tel: +372 5000 0000<br>
-    Aadress: Kopli 1, Tartu 50115 Eesti
-  </p>
-</footer>
+  <footer id="kontakt">
+    <h2>Kontakt</h2>
+    <p>
+      Email: firma@gmail.com<br>
+      Tel: +372 5000 0000<br>
+      Aadress: Kopli 1, Tartu 50115 Eesti
+    </p>
+  </footer>
 
 </body>
 </html>
