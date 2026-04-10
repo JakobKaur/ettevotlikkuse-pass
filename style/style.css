@@ -95,15 +95,60 @@ nav {
 .hero {
   width: 100%;
   aspect-ratio: 16/7;
-  background: #fff;
+  background: linear-gradient(135deg, #f3f2ff 0%, #e2dfff 45%, #d0cafb 100%);
   border: 1px solid #ccc;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
 }
 
-.hero svg {
-  width: 100%; 
-  height: 100%;
+.hero-content {
+  text-align: center;
+  max-width: 760px;
+}
+
+.hero-content h1 {
+  font-size: 42px;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.hero-content p {
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.hero-cta {
+  display: inline-block;
+  text-decoration: none;
+  color: #fff;
+  background: #5a4fcf;
+  border: 1px solid #3d35a0;
+  padding: 10px 22px;
+  font-weight: bold;
+}
+
+.hero-cta:hover {
+  background: #4a41be;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    aspect-ratio: auto;
+    min-height: 280px;
+  }
+
+  .hero-content h1 {
+    font-size: 32px;
+  }
+
+  .hero-content p {
+    font-size: 15px;
+  }
 }
 
 /* MEIST */
