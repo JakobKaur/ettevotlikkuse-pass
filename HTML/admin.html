@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Ettevõtlikkuse Pass</title>
+  <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+
+<nav>
+  <a id="logoLink" class="logo-home-link" href="esileht.html"><span class="logo-icon"></span></a>
+  <div class="nav-user">
+    <a href="profiil.html" class="profile-btn" id="navName">…</a>
+    <a href="#" class="close-btn" onclick="DB.logout();window.location.href='sisselogimine.html'">✕</a>
+  </div>
+</nav>
+
+<main class="main-block">
+  <div class="container-wide">
+    <div class="admin-header">
+      <div>
+        <h1 id="adminWelcome" class="page-title"></h1>
+        <p class="admin-subtitle">Ettevõtlikkuse Pass haldusliides</p>
+      </div>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+
+    <div id="adminStats" class="stats-grid"></div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-exp-btn" onclick="switchTab('exp')">Kogemused</button>
+      <button class="tab-btn" id="tab-usr-btn" onclick="switchTab('usr')">Kasutajad</button>
+    </div>
+
+    <div id="sec-exp" class="tab-section">
+      <div class="filter-row">
+        <button class="filter-btn active" id="f-all"      onclick="setFilter('all',this)">Kõik</button>
+        <button class="filter-btn"        id="f-pending"  onclick="setFilter('pending',this)">Ootel</button>
+        <button class="filter-btn"        id="f-approved" onclick="setFilter('approved',this)">Kinnitatud</button>
+        <button class="filter-btn"        id="f-rejected" onclick="setFilter('rejected',this)">Tagasi lükatud</button>
+      </div>
+      <div class="table-wrap">
+        <table class="a-table">
+          <thead><tr>
+            <th>Kasutaja</th><th>Pealkiri</th><th>Kategooria</th>
+            <th>Org / Kuupäev / Tunnid</th><th>Olek</th><th>Toimingud</th>
+          </tr></thead>
+          <tbody id="expBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="sec-usr" class="tab-section hidden">
+      <div class="table-wrap">
+        <table class="a-table">
+          <thead><tr>
+            <th>Nimi</th><th>Email</th><th>Vanus</th><th>Tel</th>
+            <th>Roll</th><th>Kinnitatud</th><th>Registreeritud</th><th>Kogemusi</th>
+          </tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer id="kontakt">
+  <h2>Kontakt</h2>
+  <p>Email: firma@gmail.com<br>Tel: +372 5000 0000<br>Aadress: Kopli 1, Tartu 50115 Eesti</p>
+</footer>
+
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <button onclick="closeModal()" class="modal-close">✕</button>
+    <h3 id="modalTitle" class="modal-title"></h3>
+    <div id="modalDetail" class="modal-detail"></div>
+    <label class="modal-label">Kommentaar õpilasele (valikuline):</label>
+    <textarea id="reviewNote" placeholder="Lisa kommentaar…"></textarea>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Tühista</button>
+      <button id="btnReject" class="btn-danger" onclick="submitReview('rejected')">Lükka tagasi</button>
+      <button id="btnApprove" class="btn-success" onclick="submitReview('approved')">Kinnita</button>
+    </div>
+  </div>
+</div>
+
+<script src="../DB/db.js"></script>
+<script>
+  document.getElementById('logoLink').href = DB.getHomeLink();
+  const user = DB.requireAuth('admin');
+  if (!user) throw '';
+  document.getElementById('navName').textContent   = user.fullName;
+  document.getElementById('adminWelcome').textContent = 'Tere, ' + user.fullName.split(' ')[0] + '!';
+
+  let currentFilter = 'all';
+  let currentExpId  = null;
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function statusBadge(s) {
+    const map = { pending: 'Ootel', approved: 'Kinnitatud', rejected: 'Tagasi lükatud' };
+    const state = map[s] ? s : 'pending';
+    return '<span class="status-badge status-' + state + '">' + map[state] + '</span>';
+  }
+
+  function switchTab(t) {
+    document.getElementById('sec-exp').style.display = t === 'exp' ? 'block' : 'none';
+    document.getElementById('sec-usr').style.display = t === 'usr' ? 'block' : 'none';
+    document.getElementById('tab-exp-btn').classList.toggle('active', t === 'exp');
+    document.getElementById('tab-usr-btn').classList.toggle('active', t === 'usr');
+    if (t === 'usr') renderUsers();
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderExperiences();
+  }
+
+  function renderStats() {
+    const exps  = DB.getExperiences();
+    const users = DB.getUsers().filter(u => u.role === 'student');
+    document.getElementById('adminStats').innerHTML = [
+      [users.length, 'Õpilasi'],
+      [exps.length, 'Kokku kogemusi'],
+      [exps.filter(e=>e.status==='pending').length,  'Ootel ülevaatust'],
+      [exps.filter(e=>e.status==='approved').length, 'Kinnitatud']
+    ].map(([n,l]) =>
+      '<div class="stat-card"><div class="stat-number">' + n + '</div><div class="stat-label">' + l + '</div></div>'
+    ).join('');
+  }
+
+  function renderExperiences() {
+    const allExps  = DB.getExperiences();
+    const allUsers = DB.getUsers();
+    const filtered = currentFilter === 'all' ? allExps : allExps.filter(e => e.status === currentFilter);
+    const sorted   = [...filtered].sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const tbody    = document.getElementById('expBody');
+    if (sorted.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="list-empty">Kogemusi pole.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = sorted.map(exp => {
+      const u = allUsers.find(u => u.id === exp.userId);
+      const action = '<button onclick="openModal(\'' + exp.id + '\')" class="action-btn">Vaata</button>';
+      return '<tr>' +
+        '<td>' + esc(u ? u.fullName : 'Tundmatu') + '</td>' +
+        '<td><strong>' + esc(exp.title) + '</strong></td>' +
+        '<td class="small-text">' + esc(exp.category) + '</td>' +
+        '<td class="small-text">' + esc(exp.organisation||'—') + '<br>' + (exp.date||'—') + ' · ' + (exp.hours ? exp.hours+'h' : '—') + '</td>' +
+        '<td>' + statusBadge(exp.status) + '</td>' +
+        '<td>' + action + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function renderUsers() {
+    const allUsers = DB.getUsers().filter(u => u.role === 'student');
+    const allExps  = DB.getExperiences();
+    const tbody    = document.getElementById('usersBody');
+    if (allUsers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="list-empty">Kasutajaid pole.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allUsers.map(u => {
+      const expCount = allExps.filter(e => e.userId === u.id).length;
+      return '<tr>' +
+        '<td><strong>' + esc(u.fullName) + '</strong></td>' +
+        '<td>' + esc(u.email) + '</td>' +
+        '<td>' + (u.age||'—') + '</td>' +
+        '<td>' + esc(u.phone||'—') + '</td>' +
+        '<td>' + u.role + '</td>' +
+        '<td>' + (u.verified ? 'Jah' : 'Ei') + '</td>' +
+        '<td class="small-text">' + new Date(u.createdAt).toLocaleDateString('et-EE') + '</td>' +
+        '<td>' + expCount + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function openModal(expId) {
+    currentExpId = expId;
+    const exp = DB.getExperiences().find(e => e.id === expId);
+    const u   = DB.findUserById(exp.userId);
+    document.getElementById('modalTitle').textContent  = exp.title;
+    document.getElementById('reviewNote').value        = exp.reviewNote || '';
+    document.getElementById('modalDetail').innerHTML   =
+      '<strong>Kasutaja:</strong> ' + esc(u ? u.fullName : 'Tundmatu') + '<br>' +
+      '<strong>Kategooria:</strong> ' + esc(exp.category) + '<br>' +
+      '<strong>Organisatsioon:</strong> ' + esc(exp.organisation||'—') + '<br>' +
+      '<strong>Kuupäev:</strong> ' + (exp.date||'—') + ' &nbsp; <strong>Tunnid:</strong> ' + (exp.hours||'—') + '<br>' +
+      '<strong>Kirjeldus:</strong> ' + esc(exp.description) + '<br>' +
+      '<strong>Olek:</strong> ' + statusBadge(exp.status);
+    document.getElementById('btnApprove').style.display = exp.status === 'approved' ? 'none' : '';
+    document.getElementById('btnReject').style.display  = exp.status === 'rejected'  ? 'none' : '';
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('modal').classList.remove('open'); currentExpId = null; }
+
+  function submitReview(status) {
+    DB.reviewExperience(currentExpId, status, document.getElementById('reviewNote').value.trim());
+    closeModal();
+    renderStats();
+    renderExperiences();
+  }
+
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+  renderStats();
+  renderExperiences();
+</script>
+</body>
+</html>

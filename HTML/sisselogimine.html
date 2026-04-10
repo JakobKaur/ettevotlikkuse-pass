@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sisse logimis leht</title>
-<link rel="stylesheet" href="style.css">
+<title>Sisse logimine — Ettevõtlikkuse Pass</title>
+<link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
 
 <nav>
-  <div class="logo-icon"></div>
+  <a id="logoLink" class="logo-home-link" href="esileht.html"><span class="logo-icon"></span></a>
   <ul class="nav-links">
     <li><a href="esileht.html#meist">Meist</a></li>
     <li><a href="esileht.html#teenused">Teenused</a></li>
@@ -20,29 +20,54 @@
 <main>
   <div class="login-box">
     <h2>Sisse logimine</h2>
+    <div id="msg"></div>
     <div class="field">
       <label>Email</label>
-      <input type="email" placeholder="">
+      <input type="email" id="email">
     </div>
     <div class="field">
       <label>Parool</label>
-      <input type="password" placeholder="">
+      <input type="password" id="password">
     </div>
     <div class="btn-row">
       <button onclick="window.location.href='registreerimine.html'">Registreeri</button>
-      <button onclick="window.location.href='passikategooriad.html'">Logi sisse</button>
+      <button onclick="doLogin()" class="btn-primary">Logi sisse</button>
     </div>
   </div>
 </main>
 
 <footer id="kontakt">
   <h2>Kontakt</h2>
-  <p>
-    Email: firma@gmail.com<br>
-    Tel: +372 5000 0000<br>
-    Aadress: Kopli 1, Tartu 50115 Eesti
-  </p>
+  <p>Email: firma@gmail.com<br>Tel: +372 5000 0000<br>Aadress: Kopli 1, Tartu 50115 Eesti</p>
 </footer>
 
+<script src="../DB/db.js"></script>
+<script>
+  document.getElementById('logoLink').href = DB.getHomeLink();
+  const existing = DB.getCurrentUser();
+  if (existing) window.location.href = existing.role === 'admin' ? 'admin.html' : 'dashboard.html';
+
+  function showError(text) {
+    document.getElementById('msg').innerHTML = '<p class="msg msg-error">' + text + '</p>';
+  }
+
+  function doLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    document.getElementById('msg').innerHTML = '';
+    if (!email || !password) {
+      showError('Palun täitke kõik väljad.');
+      return;
+    }
+    const result = DB.login(email, password);
+    if (!result.ok) {
+      showError(result.error);
+      return;
+    }
+    window.location.href = result.user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
 </body>
 </html>

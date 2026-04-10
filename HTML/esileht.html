@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Koduleht</title>
-<link rel="stylesheet" href="style.css">
+<title>Ettevõtlikkuse Pass</title>
+<link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
 
 <nav>
-  <div class="logo-icon"></div>
+  <a id="logoLink" class="logo-home-link" href="esileht.html"><span class="logo-icon"></span></a>
   <ul class="nav-links">
     <li><a href="#meist">Meist</a></li>
     <li><a href="#teenused">Teenused</a></li>
     <li><a href="#kontakt">Kontakt</a></li>
   </ul>
-  <div class="nav-btns">
+  <div class="nav-btns" id="navBtns">
     <a href="sisselogimine.html">Logi sisse</a>
     <a href="registreerimine.html">Registreeri</a>
   </div>
@@ -43,12 +43,18 @@
 
 <footer id="kontakt">
   <h2>Kontakt</h2>
-  <p>
-    Email: firma@gmail.com<br>
-    Tel: +372 5000 0000<br>
-    Aadress: Kopli 1, Tartu 50115 Eesti
-  </p>
+  <p>Email: firma@gmail.com<br>Tel: +372 5000 0000<br>Aadress: Kopli 1, Tartu 50115 Eesti</p>
 </footer>
+
+<script src="../DB/db.js"></script>
+<script>
+  document.getElementById('logoLink').href = DB.getHomeLink();
+  const u = DB.getCurrentUser();
+  if (u) {
+    document.getElementById('navBtns').innerHTML =
+      '<a href="' + (u.role === 'admin' ? 'admin.html' : 'dashboard.html') + '" class="btn-primary">Minu pass</a>';
+  }
+</script>
 
 </body>
 </html>

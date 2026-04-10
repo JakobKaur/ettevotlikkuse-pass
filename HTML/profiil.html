@@ -3,20 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kasutaja profiili leht</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Profiil — Ettevõtlikkuse Pass</title>
+  <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
 
   <nav>
-    <div class="logo-icon"></div>
-    <ul class="nav-links">
-      <li><a href="esileht.html#meist">Meist</a></li>
-      <li><a href="esileht.html#teenused">Teenused</a></li>
-      <li><a href="esileht.html#kontakt">Kontakt</a></li>
-    </ul>
+    <a id="logoLink" class="logo-home-link" href="esileht.html"><span class="logo-icon"></span></a>
     <div class="nav-user">
-      <a href="profiil.html" class="profile-btn">Kasutajanimi</a>
+      <a href="profiil.html" class="profile-btn" id="navName">…</a>
+      <a href="#" class="close-btn" title="Logi välja" onclick="DB.logout();window.location.href='sisselogimine.html'">✕</a>
     </div>
   </nav>
 
@@ -26,32 +22,41 @@
       <div class="profile-content">
         <div class="profile-avatar">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="none" stroke="#888" stroke-width="2"/>
-            <line x1="2" y1="2" x2="98" y2="98" stroke="#888" stroke-width="2"/>
-            <line x1="98" y1="2" x2="2" y2="98" stroke="#888" stroke-width="2"/>
+            <circle cx="50" cy="50" r="48" fill="#d8d8d8" stroke="#888" stroke-width="2"/>
+            <circle cx="50" cy="38" r="18" fill="#aaa"/>
+            <ellipse cx="50" cy="85" rx="28" ry="20" fill="#aaa"/>
           </svg>
         </div>
-        <div class="profile-info">
-          <p><strong>Nimi:</strong> Kasutajanimi</p>
-          <p><strong>Vanus:</strong> 21</p>
-          <p><strong>Email:</strong> kasutajanimi@gmail.com</p>
-          <p><strong>Tel:</strong> +372 5000 0001</p>
-        </div>
+        <div class="profile-info" id="profileInfo"></div>
       </div>
       <div class="btn-row">
-        <button onclick="window.location.href='profiilimuudatus.html'">Muuda</button>
+        <button onclick="goBack()">Tagasi</button>
+        <button onclick="window.location.href='profiilimuudatus.html'" class="btn-primary">Muuda</button>
       </div>
     </div>
   </main>
 
   <footer id="kontakt">
     <h2>Kontakt</h2>
-    <p>
-      Email: firma@gmail.com<br>
-      Tel: +372 5000 0000<br>
-      Aadress: Kopli 1, Tartu 50115 Eesti
-    </p>
+    <p>Email: firma@gmail.com<br>Tel: +372 5000 0000<br>Aadress: Kopli 1, Tartu 50115 Eesti</p>
   </footer>
+
+  <script src="../DB/db.js"></script>
+  <script>
+    document.getElementById('logoLink').href = DB.getHomeLink();
+    const user = DB.requireAuth();
+    if (!user) throw '';
+    document.getElementById('navName').textContent = user.fullName;
+    document.getElementById('profileInfo').innerHTML =
+      '<p><strong>Nimi:</strong> ' + user.fullName + '</p>' +
+      '<p><strong>Vanus:</strong> ' + user.age + '</p>' +
+      '<p><strong>Email:</strong> ' + user.email + '</p>' +
+      '<p><strong>Tel:</strong> ' + (user.phone || '—') + '</p>' +
+      '<p><strong>Roll:</strong> ' + (user.role === 'admin' ? 'Administraator' : 'Õpilane') + '</p>';
+    function goBack() {
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    }
+  </script>
 
 </body>
 </html>

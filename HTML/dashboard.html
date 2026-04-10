@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minu Pass — Ettevõtlikkuse Pass</title>
+  <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+
+<nav>
+  <a id="logoLink" class="logo-home-link" href="esileht.html"><span class="logo-icon"></span></a>
+  <div class="nav-user">
+    <a href="profiil.html" class="profile-btn" id="navName">…</a>
+    <a href="#" class="close-btn" onclick="DB.logout();window.location.href='sisselogimine.html'">✕</a>
+  </div>
+</nav>
+
+<main class="main-block">
+  <div class="container">
+    <div class="panel header-row">
+      <div>
+        <h1 id="welcomeName" class="page-title"></h1>
+        <p class="page-subtitle">Siin näed oma ettevõtlikkuse passi kokkuvõtet.</p>
+      </div>
+      <button onclick="window.location.href='lisa_kogemus.html'" class="btn-primary">+ Lisa kogemus</button>
+    </div>
+
+    <div id="stats" class="stats-grid"></div>
+
+    <div class="two-col-grid">
+      <div class="panel">
+        <div class="section-header">
+          <h3 class="section-title">Kategooriate ülevaade</h3>
+        </div>
+        <div id="catBreakdown"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-header">
+        <h3 class="section-title">Minu kogemused</h3>
+        <a href="passi_kategooriad.html" class="link-arrow">Kategooriate vaade →</a>
+      </div>
+      <div id="expList"></div>
+    </div>
+  </div>
+</main>
+
+<footer id="kontakt">
+  <h2>Kontakt</h2>
+  <p>Email: firma@gmail.com<br>Tel: +372 5000 0000<br>Aadress: Kopli 1, Tartu 50115 Eesti</p>
+</footer>
+
+<script src="../DB/db.js"></script>
+<script>
+  document.getElementById('logoLink').href = DB.getHomeLink();
+  const user = DB.requireAuth('student');
+  if (!user) throw '';
+  document.getElementById('navName').textContent = user.fullName;
+  document.getElementById('welcomeName').textContent = 'Tere, ' + user.fullName.split(' ')[0] + '!';
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function statusBadge(s) {
+    const map = {
+      pending: 'Ootel',
+      approved: 'Kinnitatud',
+      rejected: 'Tagasi lükatud'
+    };
+    const state = map[s] ? s : 'pending';
+    return '<span class="status-badge status-' + state + '">' + map[state] + '</span>';
+  }
+
+  function render() {
+    const exps     = DB.getUserExperiences(user.id);
+    const approved = exps.filter(e => e.status === 'approved');
+    const pending  = exps.filter(e => e.status === 'pending');
+    const totalHrs = approved.reduce((s, e) => s + (Number(e.hours) || 0), 0);
+
+    // Stats
+    document.getElementById('stats').innerHTML = [
+      [exps.length, 'Kokku kogemusi'],
+      [approved.length, 'Kinnitatud'],
+      [pending.length, 'Ootel'],
+      [totalHrs, 'Kinnitatud tunde']
+    ].map(([n, l]) =>
+      '<div class="stat-card"><div class="stat-number">' + n + '</div><div class="stat-label">' + l + '</div></div>'
+    ).join('');
+
+    const listEl = document.getElementById('expList');
+    if (exps.length === 0) {
+      listEl.innerHTML = '<p class="list-empty">Sul pole veel ühtegi kogemust. <a href="lisa_kogemus.html">Lisa esimene kogemus →</a></p>';
+    } else {
+      const sorted = [...exps].sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+      listEl.innerHTML = sorted.map(e =>
+        '<div class="exp-item">' +
+          '<div class="exp-main">' +
+            '<div class="exp-title">' + esc(e.title) + '</div>' +
+            '<div class="exp-meta">' + esc(e.category) + (e.organisation ? ' · ' + esc(e.organisation) : '') + (e.date ? ' · ' + e.date : '') + (e.hours ? ' · ' + e.hours + 'h' : '') + '</div>' +
+            (e.reviewNote ? '<div class="exp-note">Kommentaar: ' + esc(e.reviewNote) + '</div>' : '') +
+          '</div>' +
+          statusBadge(e.status) +
+        '</div>'
+      ).join('');
+    }
+
+    document.getElementById('catBreakdown').innerHTML = DB.CATEGORIES.map(cat => {
+      const count = approved.filter(e => e.category === cat).length;
+      return '<div class="cat-row"><span>' + cat + '</span><strong>' + count + ' kinnitatud</strong></div>';
+    }).join('');
+  }
+
+  render();
+</script>
+</body>
+</html>

@@ -3,65 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kasutaja profiili muudatus</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Profiili muudatus — Ettevõtlikkuse Pass</title>
+  <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
 
   <nav>
-    <div class="logo-icon"></div>
-    <ul class="nav-links">
-      <li><a href="esileht.html#meist">Meist</a></li>
-      <li><a href="esileht.html#teenused">Teenused</a></li>
-      <li><a href="esileht.html#kontakt">Kontakt</a></li>
-    </ul>
+    <a id="logoLink" class="logo-home-link" href="esileht.html"><span class="logo-icon"></span></a>
     <div class="nav-user">
-      <a href="profiil.html" class="profile-btn">Kasutajanimi</a>
+      <a href="profiil.html" class="profile-btn" id="navName">…</a>
+      <a href="#" class="close-btn" onclick="DB.logout();window.location.href='sisselogimine.html'">✕</a>
     </div>
   </nav>
 
   <main>
     <div class="reg-box">
       <h2>Profiili muudatus</h2>
+      <div id="msg"></div>
       <div class="field">
         <label>Täisnimi</label>
-        <input type="text" class="wide" value="Kasutajanimi">
+        <input type="text" id="fullName" class="wide">
       </div>
       <div class="field">
         <label>Vanus</label>
-        <input type="number" class="short" value="21">
+        <input type="number" id="age" class="short" min="10" max="99">
       </div>
       <div class="field">
         <label>Email</label>
-        <input type="email" class="wide" value="kasutajanimi@gmail.com">
+        <input type="email" id="email" class="wide">
       </div>
       <div class="field">
-        <label>Parool</label>
-        <input type="password" class="wide">
+        <label>Uus parool</label>
+        <input type="password" id="password" class="wide" placeholder="Jäta tühjaks, kui ei soovi muuta">
       </div>
       <div class="field">
         <label>Korda parool</label>
-        <input type="password" class="wide">
+        <input type="password" id="password2" class="wide">
       </div>
       <div class="field">
         <label>Tel</label>
-        <input type="tel" class="wide" value="+372 5000 0001">
+        <input type="tel" id="phone" class="wide">
       </div>
       <div class="btn-row">
         <button onclick="window.location.href='profiil.html'">Tagasi</button>
-        <button onclick="window.location.href='profiil.html'">Muuda</button>
+        <button onclick="doSave()" class="btn-primary">Salvesta</button>
       </div>
     </div>
   </main>
 
   <footer id="kontakt">
     <h2>Kontakt</h2>
-    <p>
-      Email: firma@gmail.com<br>
-      Tel: +372 5000 0000<br>
-      Aadress: Kopli 1, Tartu 50115 Eesti
-    </p>
+    <p>Email: firma@gmail.com<br>Tel: +372 5000 0000<br>Aadress: Kopli 1, Tartu 50115 Eesti</p>
   </footer>
+
+  <script src="../DB/db.js"></script>
+  <script>
+    document.getElementById('logoLink').href = DB.getHomeLink();
+    const user = DB.requireAuth();
+    if (!user) throw '';
+    document.getElementById('navName').textContent = user.fullName;
+    document.getElementById('fullName').value = user.fullName;
+    document.getElementById('age').value      = user.age;
+    document.getElementById('email').value    = user.email;
+    document.getElementById('phone').value    = user.phone || '';
+
+    function showMsg(text, ok) {
+      document.getElementById('msg').innerHTML =
+        '<p class="msg ' + (ok ? 'msg-success' : 'msg-error') + '">' + text + '</p>';
+    }
+
+    function doSave() {
+      const fullName  = document.getElementById('fullName').value.trim();
+      const age       = document.getElementById('age').value;
+      const email     = document.getElementById('email').value.trim();
+      const password  = document.getElementById('password').value;
+      const password2 = document.getElementById('password2').value;
+      const phone     = document.getElementById('phone').value.trim();
+      if (!fullName || !email) { showMsg('Nimi ja email on kohustuslikud.'); return; }
+      if (password && password !== password2) { showMsg('Paroolid ei kattu.'); return; }
+      if (password && password.length < 8)    { showMsg('Parool peab olema vähemalt 8 tähemärki.'); return; }
+      const fields = { fullName, age: Number(age), email, phone };
+      if (password) fields.password = password;
+      const result = DB.updateUser(user.id, fields);
+      if (!result.ok) { showMsg(result.error); return; }
+      showMsg('✓ Profiil edukalt uuendatud!', true);
+      setTimeout(() => window.location.href = 'profiil.html', 1500);
+    }
+  </script>
 
 </body>
 </html>
