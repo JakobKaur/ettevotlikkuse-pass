@@ -1,0 +1,9 @@
+{
+  "name": "ettevotlikkuse-pass",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static web app server for local/LAN access",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
